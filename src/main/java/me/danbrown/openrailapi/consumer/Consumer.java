@@ -17,12 +17,13 @@ import java.util.zip.GZIPInputStream;
 
 public abstract class Consumer {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Consumer.class);
+    protected final Logger log;
 
     private final MessageConsumer messageConsumer;
 
     public Consumer(MessageConsumer messageConsumer) {
         this.messageConsumer = messageConsumer;
+        this.log = LoggerFactory.getLogger(this.getClass());
     }
 
     @PostConstruct
@@ -31,21 +32,21 @@ public abstract class Consumer {
     }
 
     public void startConsumer() {
-        LOG.info("Starting Consumer");
+        log.info("Starting {}", this.getClass().getSimpleName());
         try {
             messageConsumer.setMessageListener(this::processMessage);
         } catch (JMSException e) {
-            LOG.error("Exception initializing message listener", e);
+            log.error("Exception initializing message listener", e);
         }
     }
 
     private void processMessage(Message message) {
         try {
             BufferedReader bufferedReader = getBufferedReader(message);
-            String xmlContent = bufferedReader.lines().collect(Collectors.joining());
-            handle(xmlContent);
+            String body = bufferedReader.lines().collect(Collectors.joining());
+            handle(body);
         } catch (JMSException | IOException e) {
-            LOG.error("Failed to read message body {}", message, e);
+            log.error("Failed to read message body {}", message, e);
         }
     }
 
