@@ -1,4 +1,4 @@
-package me.danbrown.openrailapi.model.types;
+package me.danbrown.railflow.model.types;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

@@ -1,7 +1,7 @@
-package me.danbrown.openrailapi.model.trainstatus;
+package me.danbrown.railflow.model.trainstatus;
 
-import me.danbrown.openrailapi.model.types.CircularTimes;
-import me.danbrown.openrailapi.model.types.PlatformData;
+import me.danbrown.railflow.model.types.CircularTimes;
+import me.danbrown.railflow.model.types.PlatformData;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -9,7 +9,7 @@ import org.w3c.dom.NodeList;
 import java.util.ArrayList;
 import java.util.List;
 
-import static me.danbrown.openrailapi.utils.XmlUtils.findChildNode;
+import static me.danbrown.railflow.utils.XmlUtils.findChildNode;
 
 
 /**

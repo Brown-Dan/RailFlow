@@ -1,4 +1,4 @@
-package me.danbrown.openrailapi.model.types;
+package me.danbrown.railflow.model.types;
 
 public enum PlatformSource {
     PLANNED,

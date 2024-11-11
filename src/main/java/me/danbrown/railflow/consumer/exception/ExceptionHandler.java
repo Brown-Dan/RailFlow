@@ -1,4 +1,4 @@
-package me.danbrown.openrailapi.consumer.exception;
+package me.danbrown.railflow.consumer.exception;
 
 import jakarta.jms.ExceptionListener;
 import jakarta.jms.JMSException;

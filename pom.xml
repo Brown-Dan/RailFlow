@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>me.danbrown</groupId>
-    <artifactId>OpenRailApi</artifactId>
+    <artifactId>RailFlow</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>OpenRailApi</name>
-    <description>OpenRailApi</description>
+    <name>RailFlow</name>
+    <description>RailFlow - A RESTful JSON API wrapper for National Rails' XML-based data feeds and API.</description>
     <url/>
     <licenses>
         <license/>
@@ -60,6 +60,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>2.29.9</version>
         </dependency>
     </dependencies>
 

@@ -1,13 +1,13 @@
-package me.danbrown.openrailapi.consumer;
+package me.danbrown.railflow.consumer;
 
 import jakarta.jms.MessageConsumer;
-import me.danbrown.openrailapi.mapper.TrainStatusHandler;
-import me.danbrown.openrailapi.utils.XmlUtils;
+import me.danbrown.railflow.handler.TrainStatusHandler;
+import me.danbrown.railflow.utils.XmlUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 
-import static me.danbrown.openrailapi.consumer.model.MessageTypes.TRAIN_STATUS;
+import static me.danbrown.railflow.consumer.model.MessageTypes.TRAIN_STATUS;
 
 @Component
 public class DarwinConsumer extends Consumer {

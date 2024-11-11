@@ -1,4 +1,4 @@
-package me.danbrown.openrailapi.consumer;
+package me.danbrown.railflow.consumer;
 
 import jakarta.jms.MessageConsumer;
 import org.springframework.beans.factory.annotation.Qualifier;

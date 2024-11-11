@@ -1,8 +1,8 @@
-package me.danbrown.openrailapi.mapper;
+package me.danbrown.railflow.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import me.danbrown.openrailapi.model.trainstatus.TrainStatus;
+import me.danbrown.railflow.model.trainstatus.TrainStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package me.danbrown.openrailapi.model.trainstatus;
+package me.danbrown.railflow.model.trainstatus;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -6,7 +6,7 @@ import org.w3c.dom.Node;
 import java.time.LocalTime;
 import java.util.Optional;
 
-import static me.danbrown.openrailapi.utils.XmlUtils.nodeToLocalTime;
+import static me.danbrown.railflow.utils.XmlUtils.nodeToLocalTime;
 
 /**
  * Type describing time-based forecast attributes for a TS arrival/departure/pass

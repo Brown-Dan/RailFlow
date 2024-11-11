@@ -1,4 +1,4 @@
-package me.danbrown.openrailapi.consumer.model;
+package me.danbrown.railflow.consumer.model;
 
 public enum MessageTypes {
     TRAIN_STATUS("TS");

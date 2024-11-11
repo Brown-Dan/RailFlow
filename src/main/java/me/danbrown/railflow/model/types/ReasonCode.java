@@ -1,4 +1,4 @@
-package me.danbrown.openrailapi.model.types;
+package me.danbrown.railflow.model.types;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

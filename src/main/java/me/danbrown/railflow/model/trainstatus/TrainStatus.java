@@ -1,13 +1,13 @@
-package me.danbrown.openrailapi.model.trainstatus;
+package me.danbrown.railflow.model.trainstatus;
 
-import me.danbrown.openrailapi.model.types.DisruptionReason;
+import me.danbrown.railflow.model.types.DisruptionReason;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static me.danbrown.openrailapi.utils.XmlUtils.*;
+import static me.danbrown.railflow.utils.XmlUtils.*;
 
 /**
  * Train Status. Update to the "real time" forecast data for a service.

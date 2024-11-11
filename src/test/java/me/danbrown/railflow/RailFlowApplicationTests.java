@@ -1,10 +1,10 @@
-package me.danbrown.openrailapi;
+package me.danbrown.railflow;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class OpenRailApiApplicationTests {
+class RailFlowApplicationTests {
 
     @Test
     void contextLoads() {

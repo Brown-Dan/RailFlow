@@ -1,6 +1,7 @@
-package me.danbrown.openrailapi.consumer;
+package me.danbrown.railflow.consumer;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.MessageConsumer;
@@ -29,6 +30,11 @@ public abstract class Consumer {
     @PostConstruct
     void init() {
         startConsumer();
+    }
+
+    @PreDestroy
+    void destroy() throws JMSException {
+        messageConsumer.close();
     }
 
     public void startConsumer() {

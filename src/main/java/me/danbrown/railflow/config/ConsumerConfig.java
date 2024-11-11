@@ -1,10 +1,10 @@
-package me.danbrown.openrailapi.config;
+package me.danbrown.railflow.config;
 
 import jakarta.jms.Connection;
 import jakarta.jms.JMSException;
 import jakarta.jms.MessageConsumer;
 import jakarta.jms.Session;
-import me.danbrown.openrailapi.consumer.exception.ExceptionHandler;
+import me.danbrown.railflow.consumer.exception.ExceptionHandler;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
