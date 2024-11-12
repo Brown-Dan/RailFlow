@@ -48,6 +48,10 @@ public abstract class Consumer {
 
     private void processMessage(Message message) {
         try {
+            if (!filter(message)) {
+                return;
+            }
+            log.info("Processing message with type: '{}'", message.getStringProperty("MessageType"));
             BufferedReader bufferedReader = getBufferedReader(message);
             String body = bufferedReader.lines().collect(Collectors.joining());
             handle(body);
@@ -65,4 +69,6 @@ public abstract class Consumer {
     }
 
     abstract void handle(String body);
+
+    abstract boolean filter(Message message) throws JMSException;
 }

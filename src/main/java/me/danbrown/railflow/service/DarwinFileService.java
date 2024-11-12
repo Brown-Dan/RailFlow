@@ -50,7 +50,7 @@ public class DarwinFileService {
 
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucket)
-                .key(objects.getLast().key())
+                .key(objects.get(1).key())
                 .build();
 
         ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(getObjectRequest);

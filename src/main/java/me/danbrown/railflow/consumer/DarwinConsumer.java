@@ -1,5 +1,7 @@
 package me.danbrown.railflow.consumer;
 
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
 import jakarta.jms.MessageConsumer;
 import me.danbrown.railflow.handler.TrainStatusHandler;
 import me.danbrown.railflow.utils.XmlUtils;
@@ -27,5 +29,10 @@ public class DarwinConsumer extends Consumer {
         } catch (Exception e) {
             log.error("Error parsing message body", e);
         }
+    }
+
+    @Override
+    boolean filter(Message message) throws JMSException {
+        return "TS".equals(message.getStringProperty("MessageType"));
     }
 }
