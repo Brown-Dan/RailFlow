@@ -1,7 +1,7 @@
 package me.danbrown.railflow.service;
 
 import jakarta.xml.bind.JAXBException;
-import me.danbrown.railflow.service.model.TimetableXmlMapper;
+import me.danbrown.railflow.service.mapper.XmlToTimetableMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,12 +21,12 @@ class DarwinFileServiceTest {
 
     @BeforeEach
     void setUp() {
-        darwinFileService = new DarwinFileService(s3Client, "bucket", "object", new TimetableXmlMapper());
+        darwinFileService = new DarwinFileService(s3Client, "bucket", "object", new XmlToTimetableMapper());
     }
 
     @Test
     void name() throws IOException, JAXBException {
-        darwinFileService.processTimetableFile();
+        darwinFileService.mapDataToTimetable();
     }
 
     @Test
