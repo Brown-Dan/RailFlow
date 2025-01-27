@@ -59,24 +59,19 @@ public abstract class Consumer {
     }
 
     private BufferedReader getBufferedReader(Message message) throws JMSException, IOException {
-        try {
-            ByteArrayInputStream byteArrayInputStream;
-            if (message instanceof ActiveMQBytesMessage activeMQBytesMessage) {
-                byteArrayInputStream = new ByteArrayInputStream(activeMQBytesMessage.getBody(byte[].class));
-            } else if (message instanceof ActiveMQTextMessage activeMQBytesMessage) {
-                byteArrayInputStream = new ByteArrayInputStream(activeMQBytesMessage.getBody(String.class).getBytes());
-            } else {
-                log.error("Unsupported message type {}", message.getClass());
-                throw new IllegalArgumentException("Unsupported message type");
-            }
-            GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream);
-            InputStreamReader inputStreamReader = new InputStreamReader(gzipInputStream, StandardCharsets.UTF_8);
-
-            return new BufferedReader(inputStreamReader);
-        } catch (Exception e) {
-            System.out.println("here");
+        ByteArrayInputStream byteArrayInputStream;
+        if (message instanceof ActiveMQBytesMessage activeMQBytesMessage) {
+            byteArrayInputStream = new ByteArrayInputStream(activeMQBytesMessage.getBody(byte[].class));
+        } else if (message instanceof ActiveMQTextMessage activeMQBytesMessage) {
+            byteArrayInputStream = new ByteArrayInputStream(activeMQBytesMessage.getBody(String.class).getBytes());
+        } else {
+            log.error("Unsupported message type {}", message.getClass());
+            throw new IllegalArgumentException("Unsupported message type");
         }
-        return null;
+        GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream);
+        InputStreamReader inputStreamReader = new InputStreamReader(gzipInputStream, StandardCharsets.UTF_8);
+
+        return new BufferedReader(inputStreamReader);
     }
 
     abstract void handle(String body);

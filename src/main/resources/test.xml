@@ -1,0 +1,23 @@
+<PportTimetable
+        timetableID="20250127020500" xmlns="http://www.thalesgroup.com/rtti/XmlTimetable/v8">
+    <Journey rid="202501278712719" uid="W12719" trainId="2M22" ssd="2025-01-27" toc="SE">
+        <OR tpl="VICTRIE" act="TB" plat="3" ptd="18:42" wtd="18:42"/>
+        <PP tpl="GRVRBGJ" wtp="18:44:30"/>
+        <PP tpl="VOLTRDJ" wtp="18:46:30"/>
+        <IP tpl="BRIXTON" act="T " plat="2" pta="18:49" ptd="18:49" wta="18:48:30" wtd="18:49:30"/>
+        <IP tpl="HERNEH" act="T " plat="3" pta="18:51" ptd="18:52" wta="18:51" wtd="18:52"/>
+        <IP tpl="WDULWCH" act="T " plat="2" pta="18:54" ptd="18:54" wta="18:54" wtd="18:54:30"/>
+        <IP tpl="SYDNHMH" act="T " plat="2" pta="18:57" ptd="18:57" wta="18:56:30" wtd="18:57"/>
+        <IP tpl="PNGEE" act="T " plat="2" pta="19:00" ptd="19:00" wta="18:59:30" wtd="19:00:30"/>
+        <IP tpl="KENTHOS" act="T " plat="3" pta="19:02" ptd="19:02" wta="19:02" wtd="19:02:30"/>
+        <IP tpl="BCKNHMJ" act="T " plat="3" pta="19:05" ptd="19:05" wta="19:04:30" wtd="19:05:30"/>
+        <PP tpl="SHRTLNJ" wtp="19:07"/>
+        <IP tpl="SHRTLND" act="T " plat="2" pta="19:08" ptd="19:09" wta="19:08" wtd="19:09"/>
+        <IP tpl="BROMLYS" act="T " plat="2" pta="19:11" ptd="19:12" wta="19:11" wtd="19:12"/>
+        <IP tpl="BICKLEY" act="T " plat="2" pta="19:14" ptd="19:14" wta="19:14" wtd="19:14:30"/>
+        <PP tpl="BICKLYJ" wtp="19:16"/>
+        <PP tpl="PETSWDJ" wtp="19:17:30"/>
+        <IP tpl="PETSWD" act="T " plat="4" pta="19:19" ptd="19:19" wta="19:18:30" wtd="19:19:30"/>
+        <DT tpl="ORPNGTN" act="TF" plat="8" pta="19:24" wta="19:24"/>
+    </Journey>
+</PportTimetable>
