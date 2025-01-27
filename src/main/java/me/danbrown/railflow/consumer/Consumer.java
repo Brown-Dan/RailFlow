@@ -5,6 +5,8 @@ import jakarta.annotation.PreDestroy;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.MessageConsumer;
+import org.apache.activemq.command.ActiveMQBytesMessage;
+import org.apache.activemq.command.ActiveMQTextMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,11 +59,24 @@ public abstract class Consumer {
     }
 
     private BufferedReader getBufferedReader(Message message) throws JMSException, IOException {
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(message.getBody(byte[].class));
-        GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream);
-        InputStreamReader inputStreamReader = new InputStreamReader(gzipInputStream, StandardCharsets.UTF_8);
+        try {
+            ByteArrayInputStream byteArrayInputStream;
+            if (message instanceof ActiveMQBytesMessage activeMQBytesMessage) {
+                byteArrayInputStream = new ByteArrayInputStream(activeMQBytesMessage.getBody(byte[].class));
+            } else if (message instanceof ActiveMQTextMessage activeMQBytesMessage) {
+                byteArrayInputStream = new ByteArrayInputStream(activeMQBytesMessage.getBody(String.class).getBytes());
+            } else {
+                log.error("Unsupported message type {}", message.getClass());
+                throw new IllegalArgumentException("Unsupported message type");
+            }
+            GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream);
+            InputStreamReader inputStreamReader = new InputStreamReader(gzipInputStream, StandardCharsets.UTF_8);
 
-        return new BufferedReader(inputStreamReader);
+            return new BufferedReader(inputStreamReader);
+        } catch (Exception e) {
+            System.out.println("here");
+        }
+        return null;
     }
 
     abstract void handle(String body);
