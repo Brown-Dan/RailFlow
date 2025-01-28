@@ -4,6 +4,7 @@ import jakarta.jms.JMSException;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+import me.danbrown.railflow.repository.JourneyRepository;
 import me.danbrown.railflow.service.mapper.XmlToTimetableMapper;
 import me.danbrown.railflow.service.model.Timetable;
 import me.danbrown.railflow.service.model.xml.JourneyXml;
@@ -33,12 +34,14 @@ public class DarwinFileService {
     private final String bucket;
     private final String object;
     private final XmlToTimetableMapper timetableXmlMapper;
+    private final JourneyRepository journeyRepository;
 
-    public DarwinFileService(S3Client s3Client, @Value("${darwin.s3.bucket}") String bucket, @Value("${darwin.s3.object.prefix}") String object, XmlToTimetableMapper timetableXmlMapper) {
+    public DarwinFileService(S3Client s3Client, @Value("${darwin.s3.bucket}") String bucket, @Value("${darwin.s3.object.prefix}") String object, XmlToTimetableMapper timetableXmlMapper, JourneyRepository journeyRepository) {
         this.s3Client = s3Client;
         this.bucket = bucket;
         this.object = object;
         this.timetableXmlMapper = timetableXmlMapper;
+        this.journeyRepository = journeyRepository;
     }
 
     private BufferedReader getBufferedReader(ResponseInputStream<GetObjectResponse> input) throws JMSException, IOException {
@@ -64,6 +67,8 @@ public class DarwinFileService {
         ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(getObjectRequest);
         try {
             Timetable timetable = mapDataToTimetable(getBufferedReader(s3Object));
+            LOG.info("Downloaded timetable from S3: {}", timetable.timetableId());
+            timetable.journeys().forEach(journeyRepository::insertJourney);
         } catch (JMSException | IOException e) {
             LOG.error("Failed to download file.");
         } catch (JAXBException e) {

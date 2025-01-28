@@ -1,7 +1,9 @@
 package me.danbrown.railflow.service.model;
 
-import java.time.LocalDateTime;
+import lombok.Builder;
+
 import java.time.LocalTime;
 
-public record Origin(String tiploc, LocalTime scheduledDepartureTime) {
+@Builder
+public record Origin(String tiploc, LocalTime scheduledDepartureTime, String platform) {
 }

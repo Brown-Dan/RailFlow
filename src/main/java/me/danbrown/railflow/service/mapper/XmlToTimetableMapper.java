@@ -41,6 +41,7 @@ public class XmlToTimetableMapper {
                                     .destination(mapDestination(journey.getDestinations()))
                                     .build()
                     )
+                    .filter(journey -> journey.origin() != null && journey.destination() != null)
                     .toList();
         } catch (RuntimeException e) {
             LOG.error("Failed to map journey with rids {}", journeys.stream().map(JourneyXml::getRid).toList(), e);
