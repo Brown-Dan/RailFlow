@@ -6,8 +6,6 @@ import me.danbrown.railflow.service.model.callingpoints.*;
 import me.danbrown.railflow.service.model.xml.JourneyXml;
 import me.danbrown.railflow.service.model.xml.StationXml;
 import me.danbrown.railflow.service.model.xml.TimetableXml;
-import me.danbrown.railflow.service.model.xml.wrapper.OperationalDestinationWrapper;
-import me.danbrown.railflow.service.model.xml.wrapper.OperationalOriginWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -33,7 +31,7 @@ public class XmlToTimetableMapper {
 
     private Journey mapJourney(JourneyXml journey) {
         return Journey.builder()
-                .withTrainId(journey.getTrainId())
+                .withTrainId(journey.getRid())
                 .withScheduledStartDate(stringToLocalDate(journey.getSsd()))
                 .withRoute(mapRoutePoints(journey.getStations()))
                 .build();

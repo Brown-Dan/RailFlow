@@ -26,6 +26,11 @@ public record PassengerIntermediatePoint(ScheduleAttributes scheduleAttributes,
                 .build();
     }
 
+    @Override
+    public RoutePointType routePointType() {
+        return RoutePointType.PP;
+    }
+
     public RoutePointEntity toEntity() {
         RoutePointEntity.RoutePointEntityBuilder builder = RoutePointEntity.builder();
         scheduleAttributes.addToEntityBuilder(builder);
@@ -34,6 +39,18 @@ public record PassengerIntermediatePoint(ScheduleAttributes scheduleAttributes,
                 .withWorkingTimeOfDeparture(workingScheduledTimeOfDeparture)
                 .withDelayMinutes(delayMinutes)
                 .withFalseDestination(falseDestinationTiploc)
+                .withRoutePointType(RoutePointType.PP)
+                .build();
+    }
+
+    public static PassengerIntermediatePoint fromEntity(RoutePointEntity routePointEntity) {
+        return PassengerIntermediatePoint.builder()
+                .withScheduleAttributes(ScheduleAttributes.fromEntity(routePointEntity))
+                .withCallingPointAttributes(CallingPointAttributes.fromEntity(routePointEntity))
+                .withWorkingScheduledTimeOfArrival(routePointEntity.workingTimeOfArrival())
+                .withWorkingScheduledTimeOfDeparture(routePointEntity.workingTimeOfDeparture())
+                .withDelayMinutes(routePointEntity.delayMinutes())
+                .withFalseDestinationTiploc(routePointEntity.falseDestination())
                 .build();
     }
 }

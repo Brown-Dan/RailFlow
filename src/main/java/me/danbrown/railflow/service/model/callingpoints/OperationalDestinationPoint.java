@@ -23,12 +23,27 @@ public record OperationalDestinationPoint(ScheduleAttributes scheduleAttributes,
                 .build();
     }
 
+    @Override
+    public RoutePointType routePointType() {
+        return RoutePointType.OPDT;
+    }
+
     public RoutePointEntity toEntity() {
         RoutePointEntity.RoutePointEntityBuilder builder = RoutePointEntity.builder();
         scheduleAttributes.addToEntityBuilder(builder);
         return builder.withWorkingTimeOfArrival(workingScheduledTimeOfArrival)
                 .withWorkingTimeOfDeparture(workingScheduledTimeOfDeparture)
                 .withDelayMinutes(delayMinutes)
+                .withRoutePointType(RoutePointType.OPDT)
+                .build();
+    }
+
+    public static OperationalDestinationPoint fromEntity(RoutePointEntity routePointEntity) {
+        return OperationalDestinationPoint.builder()
+                .withScheduleAttributes(ScheduleAttributes.fromEntity(routePointEntity))
+                .withWorkingScheduledTimeOfArrival(routePointEntity.workingTimeOfArrival())
+                .withWorkingScheduledTimeOfDeparture(routePointEntity.workingTimeOfDeparture())
+                .withDelayMinutes(routePointEntity.delayMinutes())
                 .build();
     }
 }

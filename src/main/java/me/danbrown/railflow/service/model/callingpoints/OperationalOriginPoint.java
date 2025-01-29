@@ -21,11 +21,25 @@ public record OperationalOriginPoint(ScheduleAttributes scheduleAttributes,
                 .build();
     }
 
+    @Override
+    public RoutePointType routePointType() {
+        return RoutePointType.OPOR;
+    }
+
     public RoutePointEntity toEntity() {
         RoutePointEntity.RoutePointEntityBuilder builder = RoutePointEntity.builder();
         scheduleAttributes.addToEntityBuilder(builder);
         return builder.withWorkingTimeOfArrival(workingScheduledTimeOfArrival)
                 .withWorkingTimeOfDeparture(workingScheduledTimeOfDeparture)
+                .withRoutePointType(RoutePointType.OPOR)
+                .build();
+    }
+
+    public static OperationalOriginPoint fromEntity(RoutePointEntity routePointEntity) {
+        return OperationalOriginPoint.builder()
+                .withScheduleAttributes(ScheduleAttributes.fromEntity(routePointEntity))
+                .withWorkingScheduledTimeOfArrival(routePointEntity.workingTimeOfArrival())
+                .withWorkingScheduledTimeOfDeparture(routePointEntity.workingTimeOfDeparture())
                 .build();
     }
 }

@@ -62,16 +62,17 @@ public abstract class Consumer {
         ByteArrayInputStream byteArrayInputStream;
         if (message instanceof ActiveMQBytesMessage activeMQBytesMessage) {
             byteArrayInputStream = new ByteArrayInputStream(activeMQBytesMessage.getBody(byte[].class));
+            GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream);
+            InputStreamReader inputStreamReader = new InputStreamReader(gzipInputStream, StandardCharsets.UTF_8);
+            return new BufferedReader(inputStreamReader);
         } else if (message instanceof ActiveMQTextMessage activeMQBytesMessage) {
             byteArrayInputStream = new ByteArrayInputStream(activeMQBytesMessage.getBody(String.class).getBytes());
+            InputStreamReader inputStreamReader = new InputStreamReader(byteArrayInputStream, StandardCharsets.UTF_8);
+            return new BufferedReader(inputStreamReader);
         } else {
             log.error("Unsupported message type {}", message.getClass());
             throw new IllegalArgumentException("Unsupported message type");
         }
-        GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream);
-        InputStreamReader inputStreamReader = new InputStreamReader(gzipInputStream, StandardCharsets.UTF_8);
-
-        return new BufferedReader(inputStreamReader);
     }
 
     abstract void handle(String body);

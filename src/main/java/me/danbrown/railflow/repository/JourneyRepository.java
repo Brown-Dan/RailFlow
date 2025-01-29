@@ -3,11 +3,13 @@ package me.danbrown.railflow.repository;
 import me.danbrown.railflow.repository.model.JourneyEntity;
 import me.danbrown.railflow.repository.model.RoutePointEntity;
 import me.danbrown.railflow.service.model.Journey;
-import me.danbrown.railflow.service.model.callingpoints.RoutePoint;
+import me.danbrown.railflow.service.model.callingpoints.*;
 import org.jooq.DSLContext;
+import org.jooq.Record;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 import static uk.co.railflow.generated.Tables.JOURNEY;
 import static uk.co.railflow.generated.Tables.ROUTE_POINT;
@@ -30,6 +32,29 @@ public class JourneyRepository {
                 .set(JOURNEY.SCHEDULED_START_DATE, journeyEntity.scheduledStartDate())
                 .execute();
         insertRoutePoints(journeyEntity.routePointEntities(), journeyEntity.trainId());
+    }
+
+    public Optional<Journey> fetchJourneyByTrainId(String trainId) {
+        Record journeyRecord = db.select()
+                .from(JOURNEY)
+                .where(JOURNEY.TRAIN_ID.eq(trainId))
+                .fetchOne();
+
+        if (journeyRecord == null) {
+            return Optional.empty();
+        }
+
+        List<RoutePointEntity> routePoints = db.select()
+                .from(ROUTE_POINT)
+                .where(ROUTE_POINT.TRAIN_ID.eq(trainId))
+                .orderBy(ROUTE_POINT.POSITION.asc())
+                .fetchInto(RoutePointEntity.class);
+
+        return Optional.of(mapJourneyEntityToJourney(JourneyEntity.builder()
+                .withTrainId(journeyRecord.get(JOURNEY.TRAIN_ID))
+                .withScheduledStartDate(journeyRecord.get(JOURNEY.SCHEDULED_START_DATE))
+                .withRoutePointEntities(routePoints)
+                .build()));
     }
 
     private void insertRoutePoints(List<RoutePointEntity> routePointEntities, String trainId) {
@@ -61,5 +86,25 @@ public class JourneyRepository {
                 .withScheduledStartDate(journey.scheduledStartDate())
                 .withRoutePointEntities(journey.route().stream().map(RoutePoint::toEntity).toList())
                 .build();
+    }
+
+    private Journey mapJourneyEntityToJourney(JourneyEntity journeyEntity) {
+        return Journey.builder()
+                .withTrainId(journeyEntity.trainId())
+                .withScheduledStartDate(journeyEntity.scheduledStartDate())
+                .withRoute(journeyEntity.routePointEntities().stream().map(this::mapRoutePointEntityToRoutePoint).toList())
+                .build();
+    }
+
+    private RoutePoint mapRoutePointEntityToRoutePoint(RoutePointEntity routePointEntity) {
+        return switch (routePointEntity.routePointType()) {
+            case OR -> PassengerOriginPoint.fromEntity(routePointEntity);
+            case OPOR -> OperationalOriginPoint.fromEntity(routePointEntity);
+            case IP -> PassengerIntermediatePoint.fromEntity(routePointEntity);
+            case OPIP -> OperationalIntermediatePoint.fromEntity(routePointEntity);
+            case PP -> IntermediatePassingPoint.fromEntity(routePointEntity);
+            case DT -> PassengerDestinationPoint.fromEntity(routePointEntity);
+            case OPDT -> OperationalDestinationPoint.fromEntity(routePointEntity);
+        };
     }
 }

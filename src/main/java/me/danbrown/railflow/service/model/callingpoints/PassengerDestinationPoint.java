@@ -25,6 +25,11 @@ public record PassengerDestinationPoint(ScheduleAttributes scheduleAttributes,
                 .build();
     }
 
+    @Override
+    public RoutePointType routePointType() {
+        return RoutePointType.DT;
+    }
+
     public RoutePointEntity toEntity() {
         RoutePointEntity.RoutePointEntityBuilder builder = RoutePointEntity.builder();
         scheduleAttributes.addToEntityBuilder(builder);
@@ -32,6 +37,17 @@ public record PassengerDestinationPoint(ScheduleAttributes scheduleAttributes,
         return builder.withWorkingTimeOfArrival(workingScheduledTimeOfArrival)
                 .withWorkingTimeOfDeparture(workingScheduledTimeOfDeparture)
                 .withDelayMinutes(delayMinutes)
+                .withRoutePointType(RoutePointType.DT)
+                .build();
+    }
+
+    public static PassengerDestinationPoint fromEntity(RoutePointEntity routePointEntity) {
+        return PassengerDestinationPoint.builder()
+                .withScheduleAttributes(ScheduleAttributes.fromEntity(routePointEntity))
+                .withCallingPointAttributes(CallingPointAttributes.fromEntity(routePointEntity))
+                .withWorkingScheduledTimeOfArrival(routePointEntity.workingTimeOfArrival())
+                .withWorkingScheduledTimeOfDeparture(routePointEntity.workingTimeOfDeparture())
+                .withDelayMinutes(routePointEntity.delayMinutes())
                 .build();
     }
 }

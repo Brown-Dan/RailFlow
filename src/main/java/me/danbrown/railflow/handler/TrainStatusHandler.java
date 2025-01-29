@@ -4,11 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.danbrown.railflow.model.trainstatus.TrainStatus;
 import me.danbrown.railflow.repository.JourneyRepository;
+import me.danbrown.railflow.service.model.Journey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.util.Optional;
 
 @Component
 public class TrainStatusHandler {
@@ -28,8 +31,7 @@ public class TrainStatusHandler {
             Node trainStatusNode = nodes.item(0);
             TrainStatus trainStatus = TrainStatus.fromNode(trainStatusNode);
 
-//            LOG.info(objectMapper.writeValueAsString(trainStatus));
-
+            Optional<Journey> journey = journeyRepository.fetchJourneyByTrainId(trainStatus.rttiTrainId());
         }
     }
 }

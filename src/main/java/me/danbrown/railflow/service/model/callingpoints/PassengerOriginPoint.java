@@ -25,6 +25,11 @@ public record PassengerOriginPoint(ScheduleAttributes scheduleAttributes,
                 .build();
     }
 
+    @Override
+    public RoutePointType routePointType() {
+        return RoutePointType.OR;
+    }
+
     public RoutePointEntity toEntity() {
         RoutePointEntity.RoutePointEntityBuilder builder = RoutePointEntity.builder();
         scheduleAttributes.addToEntityBuilder(builder);
@@ -32,6 +37,17 @@ public record PassengerOriginPoint(ScheduleAttributes scheduleAttributes,
         return builder.withWorkingTimeOfArrival(workingScheduledTimeOfArrival)
                 .withWorkingTimeOfDeparture(workingScheduledTimeOfDeparture)
                 .withFalseDestination(falseDestinationTiploc)
+                .withRoutePointType(RoutePointType.OR)
+                .build();
+    }
+
+    public static PassengerOriginPoint fromEntity(RoutePointEntity routePointEntity) {
+        return PassengerOriginPoint.builder()
+                .withScheduleAttributes(ScheduleAttributes.fromEntity(routePointEntity))
+                .withCallingPointAttributes(CallingPointAttributes.fromEntity(routePointEntity))
+                .withWorkingScheduledTimeOfArrival(routePointEntity.workingTimeOfArrival())
+                .withWorkingScheduledTimeOfDeparture(routePointEntity.workingTimeOfDeparture())
+                .withFalseDestinationTiploc(routePointEntity.falseDestination())
                 .build();
     }
 }
