@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 import static uk.co.railflow.generated.Tables.JOURNEY;
-import static uk.co.railflow.generated.Tables.ROUTE_POINT_ENTITY;
+import static uk.co.railflow.generated.Tables.ROUTE_POINT;
 
 
 @Component
@@ -35,22 +35,22 @@ public class JourneyRepository {
     private void insertRoutePoints(List<RoutePointEntity> routePointEntities, String trainId) {
         for (int i = 0; i < routePointEntities.size(); i++) {
             RoutePointEntity routePointEntity = routePointEntities.get(i);
-            db.insertInto(ROUTE_POINT_ENTITY)
-                    .set(ROUTE_POINT_ENTITY.TRAIN_ID, trainId)
-                    .set(ROUTE_POINT_ENTITY.ROUTE_POINT_TYPE, routePointEntity.routePointType().name())
-                    .set(ROUTE_POINT_ENTITY.POSITION, i)
-                    .set(ROUTE_POINT_ENTITY.TIPLOC, routePointEntity.tiploc())
-                    .set(ROUTE_POINT_ENTITY.ACTIVITY_TYPE, routePointEntity.activityType())
-                    .set(ROUTE_POINT_ENTITY.PLANNED_ACTIVITY_TYPE, routePointEntity.plannedActivityType())
-                    .set(ROUTE_POINT_ENTITY.IS_CANCELLED, routePointEntity.isCancelled())
-                    .set(ROUTE_POINT_ENTITY.PLATFORM, routePointEntity.platform())
-                    .set(ROUTE_POINT_ENTITY.PLANNED_TIME_OF_ARRIVAL, routePointEntity.plannedTimeOfArrival())
-                    .set(ROUTE_POINT_ENTITY.PLANNED_TIME_OF_DEPARTURE, routePointEntity.plannedTimeOfDeparture())
-                    .set(ROUTE_POINT_ENTITY.WORKING_TIME_OF_ARRIVAL, routePointEntity.workingTimeOfArrival())
-                    .set(ROUTE_POINT_ENTITY.WORKING_TIME_OF_DEPARTURE, routePointEntity.workingTimeOfDeparture())
-                    .set(ROUTE_POINT_ENTITY.FALSE_DESTINATION, routePointEntity.falseDestination())
-                    .set(ROUTE_POINT_ENTITY.DELAY_MINUTES, routePointEntity.delayMinutes())
-                    .set(ROUTE_POINT_ENTITY.WORKING_TIME_OF_PASSING, routePointEntity.workingTimeOfPassing())
+            db.insertInto(ROUTE_POINT)
+                    .set(ROUTE_POINT.TRAIN_ID, trainId)
+                    .set(ROUTE_POINT.ROUTE_POINT_TYPE, routePointEntity.routePointType().name())
+                    .set(ROUTE_POINT.POSITION, i)
+                    .set(ROUTE_POINT.TIPLOC, routePointEntity.tiploc())
+                    .set(ROUTE_POINT.ACTIVITY_TYPE, routePointEntity.activityType())
+                    .set(ROUTE_POINT.PLANNED_ACTIVITY_TYPE, routePointEntity.plannedActivityType())
+                    .set(ROUTE_POINT.IS_CANCELLED, routePointEntity.isCancelled())
+                    .set(ROUTE_POINT.PLATFORM, routePointEntity.platform())
+                    .set(ROUTE_POINT.PLANNED_TIME_OF_ARRIVAL, routePointEntity.plannedTimeOfArrival())
+                    .set(ROUTE_POINT.PLANNED_TIME_OF_DEPARTURE, routePointEntity.plannedTimeOfDeparture())
+                    .set(ROUTE_POINT.WORKING_TIME_OF_ARRIVAL, routePointEntity.workingTimeOfArrival())
+                    .set(ROUTE_POINT.WORKING_TIME_OF_DEPARTURE, routePointEntity.workingTimeOfDeparture())
+                    .set(ROUTE_POINT.FALSE_DESTINATION, routePointEntity.falseDestination())
+                    .set(ROUTE_POINT.DELAY_MINUTES, routePointEntity.delayMinutes())
+                    .set(ROUTE_POINT.WORKING_TIME_OF_PASSING, routePointEntity.workingTimeOfPassing())
                     .execute();
         }
     }
