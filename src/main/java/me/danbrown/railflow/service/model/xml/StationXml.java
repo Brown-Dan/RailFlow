@@ -1,8 +1,12 @@
 package me.danbrown.railflow.service.model.xml;
 
-import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import lombok.Getter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
+@Getter
 public class StationXml {
 
     @XmlAttribute(name = "tpl", required = true)
@@ -15,7 +19,7 @@ public class StationXml {
     private String planAct;
 
     @XmlAttribute(name = "can")
-    private Boolean can;
+    private boolean can;
 
     @XmlAttribute(name = "plat")
     private String plat;
@@ -35,43 +39,9 @@ public class StationXml {
     @XmlAttribute(name = "fd")
     private String fd;
 
-    public String getTpl() {
-        return tpl;
-    }
+    @XmlAttribute(name = "rdelay")
+    private int rdelay;
 
-    public String getAct() {
-        return act;
-    }
-
-    public String getPlanAct() {
-        return planAct;
-    }
-
-    public Boolean getCan() {
-        return can;
-    }
-
-    public String getPlat() {
-        return plat;
-    }
-
-    public String getPta() {
-        return pta;
-    }
-
-    public String getPtd() {
-        return ptd;
-    }
-
-    public String getWta() {
-        return wta;
-    }
-
-    public String getWtd() {
-        return wtd;
-    }
-
-    public String getFd() {
-        return fd;
-    }
+    @XmlAttribute(name = "wtp")
+    private String wtp;
 }

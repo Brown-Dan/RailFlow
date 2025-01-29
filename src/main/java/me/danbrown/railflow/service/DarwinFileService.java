@@ -81,6 +81,7 @@ public class DarwinFileService {
         JAXBContext jaxbContext = JAXBContext.newInstance(TimetableXml.class, JourneyXml.class, StationXml.class);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         TimetableXml timetableXml = (TimetableXml) unmarshaller.unmarshal(data);
+
         return timetableXmlMapper.map(timetableXml);
     }
 }

@@ -1,21 +1,20 @@
 package me.danbrown.railflow.repository;
 
-import me.danbrown.railflow.service.model.Destination;
+import me.danbrown.railflow.repository.model.JourneyEntity;
+import me.danbrown.railflow.repository.model.RoutePointEntity;
 import me.danbrown.railflow.service.model.Journey;
-import me.danbrown.railflow.service.model.Origin;
+import me.danbrown.railflow.service.model.callingpoints.RoutePoint;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.List;
 
 import static uk.co.railflow.generated.Tables.JOURNEY;
-import static uk.co.railflow.generated.Tables.STATION;
+import static uk.co.railflow.generated.Tables.ROUTE_POINT_ENTITY;
 
 
 @Component
 public class JourneyRepository {
-
 
     private final DSLContext db;
 
@@ -23,65 +22,44 @@ public class JourneyRepository {
         this.db = db;
     }
 
-    public Optional<Journey> fetchJourneyById(String trainId) {
-        return db.select(JOURNEY.TRAIN_ID, JOURNEY.SCHEDULED_START_DATE, JOURNEY.ORIGIN, JOURNEY.DESTINATION)
-                .from(JOURNEY)
-                .where(JOURNEY.TRAIN_ID.eq(trainId))
-                .fetchOptionalInto(uk.co.railflow.generated.tables.pojos.Journey.class)
-                .map(journey -> {
-                    Journey.JourneyBuilder journeyBuilder = Journey.builder();
-                    if (journey.getOrigin() != null) {
-                        Origin origin = db.select(STATION.TIPLOC, STATION.SCHEDULED_DEPARTURE_TIME)
-                                .from(STATION)
-                                .where(STATION.ID.eq(journey.getOrigin()))
-                                .fetchSingleInto(Origin.class);
-                        journeyBuilder.origin(origin);
-                    };
-
-                    if (journey.getDestination() != null) {
-                        Destination destination = db.select(STATION.TIPLOC, STATION.SCHEDULED_ARRIVAL_TIME)
-                                .from(STATION)
-                                .where(STATION.ID.eq(journey.getDestination()))
-                                .fetchSingleInto(Destination.class);
-                        journeyBuilder.destination(destination);
-                    };
-
-                    return journeyBuilder
-                            .trainId(journey.getTrainId())
-                            .scheduledStartDate(journey.getScheduledStartDate())
-                            .build();
-                });
-    }
-
     public void insertJourney(Journey journey) {
-        UUID originId = insertOrigin(journey.origin());
-        UUID destinationId = insertDestination(journey.destination());
+        JourneyEntity journeyEntity = mapJourneyToJourneyEntity(journey);
 
         db.insertInto(JOURNEY)
-                .set(JOURNEY.TRAIN_ID, journey.trainId())
-                .set(JOURNEY.SCHEDULED_START_DATE, journey.scheduledStartDate())
-                .set(JOURNEY.ORIGIN, originId)
-                .set(JOURNEY.DESTINATION, destinationId)
+                .set(JOURNEY.TRAIN_ID, journeyEntity.trainId())
+                .set(JOURNEY.SCHEDULED_START_DATE, journeyEntity.scheduledStartDate())
                 .execute();
+        insertRoutePoints(journeyEntity.routePointEntities(), journeyEntity.trainId());
     }
 
-    private UUID insertOrigin(Origin origin) {
-        UUID id = UUID.randomUUID();
-        db.insertInto(STATION)
-                .set(STATION.ID, id)
-                .set(STATION.SCHEDULED_DEPARTURE_TIME, origin.scheduledDepartureTime())
-                .set(STATION.TIPLOC, origin.tiploc())
-                .execute();
-        return id;
+    private void insertRoutePoints(List<RoutePointEntity> routePointEntities, String trainId) {
+        for (int i = 0; i < routePointEntities.size(); i++) {
+            RoutePointEntity routePointEntity = routePointEntities.get(i);
+            db.insertInto(ROUTE_POINT_ENTITY)
+                    .set(ROUTE_POINT_ENTITY.TRAIN_ID, trainId)
+                    .set(ROUTE_POINT_ENTITY.ROUTE_POINT_TYPE, routePointEntity.routePointType().name())
+                    .set(ROUTE_POINT_ENTITY.POSITION, i)
+                    .set(ROUTE_POINT_ENTITY.TIPLOC, routePointEntity.tiploc())
+                    .set(ROUTE_POINT_ENTITY.ACTIVITY_TYPE, routePointEntity.activityType())
+                    .set(ROUTE_POINT_ENTITY.PLANNED_ACTIVITY_TYPE, routePointEntity.plannedActivityType())
+                    .set(ROUTE_POINT_ENTITY.IS_CANCELLED, routePointEntity.isCancelled())
+                    .set(ROUTE_POINT_ENTITY.PLATFORM, routePointEntity.platform())
+                    .set(ROUTE_POINT_ENTITY.PLANNED_TIME_OF_ARRIVAL, routePointEntity.plannedTimeOfArrival())
+                    .set(ROUTE_POINT_ENTITY.PLANNED_TIME_OF_DEPARTURE, routePointEntity.plannedTimeOfDeparture())
+                    .set(ROUTE_POINT_ENTITY.WORKING_TIME_OF_ARRIVAL, routePointEntity.workingTimeOfArrival())
+                    .set(ROUTE_POINT_ENTITY.WORKING_TIME_OF_DEPARTURE, routePointEntity.workingTimeOfDeparture())
+                    .set(ROUTE_POINT_ENTITY.FALSE_DESTINATION, routePointEntity.falseDestination())
+                    .set(ROUTE_POINT_ENTITY.DELAY_MINUTES, routePointEntity.delayMinutes())
+                    .set(ROUTE_POINT_ENTITY.WORKING_TIME_OF_PASSING, routePointEntity.workingTimeOfPassing())
+                    .execute();
+        }
     }
 
-    private UUID insertDestination(Destination destination) {
-        UUID id = UUID.randomUUID();
-        db.insertInto(STATION)
-                .set(STATION.ID, id)
-                .set(STATION.SCHEDULED_ARRIVAL_TIME, destination.scheduledArrivalTime())
-                .set(STATION.TIPLOC, destination.tiploc())
-                .execute();
-        return id;
+    private JourneyEntity mapJourneyToJourneyEntity(Journey journey) {
+        return JourneyEntity.builder()
+                .withTrainId(journey.trainId())
+                .withScheduledStartDate(journey.scheduledStartDate())
+                .withRoutePointEntities(journey.route().stream().map(RoutePoint::toEntity).toList())
+                .build();
     }
 }

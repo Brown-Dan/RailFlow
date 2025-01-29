@@ -27,11 +27,6 @@ public class TrainStatusHandler {
         if (nodes.getLength() > 0) {
             Node trainStatusNode = nodes.item(0);
             TrainStatus trainStatus = TrainStatus.fromNode(trainStatusNode);
-            journeyRepository.fetchJourneyById(trainStatus.rttiTrainId()).ifPresentOrElse(journey -> {
-                LOG.info("Journey already exists: {} - distruption reason {}", journey, trainStatus.disruptionReason());
-            }, () -> {
-//                LOG.info("Journey inserted: {}", trainStatus.rttiTrainId());
-            });
 
 //            LOG.info(objectMapper.writeValueAsString(trainStatus));
 

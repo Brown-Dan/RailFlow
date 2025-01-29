@@ -8,9 +8,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
 import software.amazon.awssdk.services.s3.S3Client;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 @ExtendWith(MockitoExtension.class)
 class DarwinFileServiceTest {
@@ -30,7 +34,7 @@ class DarwinFileServiceTest {
 
     @Test
     void name() throws IOException, JAXBException {
-//        darwinFileService.mapDataToTimetable();
+        darwinFileService.mapDataToTimetable(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(new ClassPathResource("test.xml").getContentAsByteArray()))));
     }
 
     @Test
