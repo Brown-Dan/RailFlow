@@ -1,13 +1,17 @@
 package me.danbrown.railflow.repository;
 
+import me.danbrown.railflow.controller.model.SimpleJourneyResource;
 import me.danbrown.railflow.repository.model.JourneyEntity;
 import me.danbrown.railflow.repository.model.RoutePointEntity;
 import me.danbrown.railflow.service.model.Journey;
 import me.danbrown.railflow.service.model.callingpoints.*;
 import org.jooq.DSLContext;
 import org.jooq.Record;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,20 +22,63 @@ import static uk.co.railflow.generated.Tables.ROUTE_POINT;
 @Component
 public class JourneyRepository {
 
-    private final DSLContext db;
+    private static final Logger LOG = LoggerFactory.getLogger(JourneyRepository.class);
 
-    public JourneyRepository(DSLContext db) {
+    private final DSLContext db;
+    private final TiplocRepository tiplocRepository;
+
+    public JourneyRepository(DSLContext db, TiplocRepository tiplocRepository) {
         this.db = db;
+        this.tiplocRepository = tiplocRepository;
     }
 
     public void insertJourney(Journey journey) {
         JourneyEntity journeyEntity = mapJourneyToJourneyEntity(journey);
+
+        if (fetchJourneyByTrainId(journeyEntity.trainId()).isPresent()) {
+            LOG.warn("Journey with duplicate RIID: {} already exists with data {}", journey.trainId(), journey);
+            return;
+        }
 
         db.insertInto(JOURNEY)
                 .set(JOURNEY.TRAIN_ID, journeyEntity.trainId())
                 .set(JOURNEY.SCHEDULED_START_DATE, journeyEntity.scheduledStartDate())
                 .execute();
         insertRoutePoints(journeyEntity.routePointEntities(), journeyEntity.trainId());
+    }
+
+    public List<SimpleJourneyResource> fetchSimpleJourneyByOriginTiploc(String tiploc) {
+        List<RoutePointEntity> origin = db.select()
+                .from(ROUTE_POINT)
+                .where(ROUTE_POINT.TIPLOC.eq(tiploc).and(ROUTE_POINT.ROUTE_POINT_TYPE.eq(RoutePointType.OR.name())))
+                .fetchInto(RoutePointEntity.class);
+
+
+        return origin.stream().map(entity -> fetchSimpleJourneyResourceByTrainId(entity.trainId())).toList();
+    }
+
+    private SimpleJourneyResource fetchSimpleJourneyResourceByTrainId(String trainId) {
+        Journey journey = fetchJourneyByTrainId(trainId).orElseThrow();
+
+        PassengerOriginPoint passengerOriginPoint = (PassengerOriginPoint) journey.route().getFirst();
+        PassengerDestinationPoint passengerDestinationPoint = (PassengerDestinationPoint) journey.route().getLast();
+
+        return new SimpleJourneyResource(
+                tiplocRepository.getStationByTiploc(passengerOriginPoint.scheduleAttributes().tiploc()).name(),
+                journey.scheduledStartDate().atTime(passengerOriginPoint.callingPointAttributes().publicScheduledTimeOfDeparture()).format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy h:mm a")),
+                tiplocRepository.getStationByTiploc(passengerDestinationPoint.scheduleAttributes().tiploc()).name(),
+                journey.scheduledStartDate().atTime(passengerDestinationPoint.callingPointAttributes().publicScheduledTimeOfArrival()).format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy h:mm a"))
+        );
+    }
+
+    public List<Journey> fetchJourneyByOriginTiploc(String tiploc) {
+        List<RoutePointEntity> routePointEntity = db.select()
+                .from(ROUTE_POINT)
+                .where(ROUTE_POINT.TIPLOC.eq(tiploc).and(ROUTE_POINT.ROUTE_POINT_TYPE.eq(RoutePointType.OR.name())))
+                .fetchInto(RoutePointEntity.class);
+
+        return routePointEntity.stream().map(entity -> fetchJourneyByTrainId(entity.trainId())).filter(Optional::isPresent)
+                .map(Optional::get).toList();
     }
 
     public Optional<Journey> fetchJourneyByTrainId(String trainId) {
@@ -100,9 +147,9 @@ public class JourneyRepository {
         return switch (routePointEntity.routePointType()) {
             case OR -> PassengerOriginPoint.fromEntity(routePointEntity);
             case OPOR -> OperationalOriginPoint.fromEntity(routePointEntity);
-            case IP -> PassengerIntermediatePoint.fromEntity(routePointEntity);
+            case IP -> PassingPoint.fromEntity(routePointEntity);
             case OPIP -> OperationalIntermediatePoint.fromEntity(routePointEntity);
-            case PP -> IntermediatePassingPoint.fromEntity(routePointEntity);
+            case PP -> PassengerIntermediatePoint.fromEntity(routePointEntity);
             case DT -> PassengerDestinationPoint.fromEntity(routePointEntity);
             case OPDT -> OperationalDestinationPoint.fromEntity(routePointEntity);
         };

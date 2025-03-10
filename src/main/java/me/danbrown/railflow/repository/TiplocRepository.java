@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 @Repository
 public class TiplocRepository {
 
-    private ObjectMapper objectMapper;
-    private Map<String, Station> tiplocToStationMap;
+    private final ObjectMapper objectMapper;
+    private final Map<String, Station> tiplocToStationMap;
 
     public TiplocRepository(ObjectMapper objectMapper) throws IOException {
         this.objectMapper = objectMapper;

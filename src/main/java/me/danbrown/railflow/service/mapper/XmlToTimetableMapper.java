@@ -52,7 +52,7 @@ public class XmlToTimetableMapper {
             case OPOR -> OperationalOriginPoint.fromXml(station);
             case IP -> PassengerIntermediatePoint.fromXml(station);
             case OPIP -> OperationalIntermediatePoint.fromXml(station);
-            case PP -> IntermediatePassingPoint.fromXml(station);
+            case PP -> PassingPoint.fromXml(station);
             case DT -> PassengerDestinationPoint.fromXml(station);
             case OPDT -> OperationalDestinationPoint.fromXml(station);
         };

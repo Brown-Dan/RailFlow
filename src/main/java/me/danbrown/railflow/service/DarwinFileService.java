@@ -4,6 +4,7 @@ import jakarta.jms.JMSException;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+import me.danbrown.railflow.repository.FileImportRepository;
 import me.danbrown.railflow.repository.JourneyRepository;
 import me.danbrown.railflow.service.mapper.XmlToTimetableMapper;
 import me.danbrown.railflow.service.model.Timetable;
@@ -23,7 +24,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import java.util.zip.GZIPInputStream;
+
+import static java.util.function.Predicate.not;
 
 @Service
 public class DarwinFileService {
@@ -35,13 +39,15 @@ public class DarwinFileService {
     private final String object;
     private final XmlToTimetableMapper timetableXmlMapper;
     private final JourneyRepository journeyRepository;
+    private final FileImportRepository fileImportRepository;
 
-    public DarwinFileService(S3Client s3Client, @Value("${darwin.s3.bucket}") String bucket, @Value("${darwin.s3.object.prefix}") String object, XmlToTimetableMapper timetableXmlMapper, JourneyRepository journeyRepository) {
+    public DarwinFileService(S3Client s3Client, @Value("${darwin.s3.bucket}") String bucket, @Value("${darwin.s3.object.prefix}") String object, XmlToTimetableMapper timetableXmlMapper, JourneyRepository journeyRepository, FileImportRepository fileImportRepository) {
         this.s3Client = s3Client;
         this.bucket = bucket;
         this.object = object;
         this.timetableXmlMapper = timetableXmlMapper;
         this.journeyRepository = journeyRepository;
+        this.fileImportRepository = fileImportRepository;
     }
 
     private BufferedReader getBufferedReader(ResponseInputStream<GetObjectResponse> input) throws JMSException, IOException {
@@ -57,27 +63,27 @@ public class DarwinFileService {
                 .prefix(object)
                 .build();
         ListObjectsV2Response listObjectsV2Response = s3Client.listObjectsV2(listObjectsV2Request);
-        List<S3Object> objects = listObjectsV2Response.contents();
+        List<S3Object> objects = listObjectsV2Response.contents().stream().filter(not(file -> fileImportRepository.importedFileExists(file.eTag()))).toList();
 
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+        objects.stream().map(obj -> GetObjectRequest.builder()
                 .bucket(bucket)
-                .key(objects.getLast().key())
-                .build();
-
-        ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(getObjectRequest);
-        try {
-            Timetable timetable = mapDataToTimetable(getBufferedReader(s3Object));
+                .key(obj.key())
+                .build()).map(s3Client::getObject).map(inputStream -> {
+            try {
+                return mapDataToTimetable(getBufferedReader(inputStream));
+            } catch (JAXBException | IOException | JMSException e) {
+                LOG.error("Failed mapping input stream to timetable", e);
+                return null;
+            }
+        }).filter(Objects::nonNull).forEach(timetable -> {
             LOG.info("Downloaded timetable from S3: {}", timetable.timetableId());
             timetable.journeys().forEach(journeyRepository::insertJourney);
-        } catch (JMSException | IOException e) {
-            LOG.error("Failed to download file.");
-        } catch (JAXBException e) {
-            throw new RuntimeException(e);
-        }
+        });
+
+        objects.forEach(obj -> fileImportRepository.insertImportedFile(obj.eTag()));
     }
 
     public Timetable mapDataToTimetable(BufferedReader data) throws JAXBException, IOException {
-        LOG.info("Processing timetable file from S3");
         JAXBContext jaxbContext = JAXBContext.newInstance(TimetableXml.class, JourneyXml.class, StationXml.class);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         TimetableXml timetableXml = (TimetableXml) unmarshaller.unmarshal(data);

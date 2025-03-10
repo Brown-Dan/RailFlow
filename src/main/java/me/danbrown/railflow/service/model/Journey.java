@@ -4,6 +4,7 @@ import lombok.Builder;
 import me.danbrown.railflow.service.model.callingpoints.RoutePoint;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder(setterPrefix = "with")
